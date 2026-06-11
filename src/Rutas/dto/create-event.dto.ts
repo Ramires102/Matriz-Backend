@@ -1,14 +1,31 @@
-/**
- * DTO para la creación de eventos.
- * Se requieren los campos obligatorios del schema y el owner se obtiene desde el token.
- */
+import { IsString, IsOptional, IsNumber, IsDateString, Min, IsBoolean } from 'class-validator'
+
 export class CreateEventDto {
-  name: string
+  @IsString()
+  name!: string
+
+  @IsOptional()
+  @IsString()
   description?: string
-  image?: string
-  initDate: string
+
+  @IsDateString()
+  initDate!: string
+
+  @IsOptional()
+  @IsDateString()
   endingDate?: string
-  location: string
-  categoryFK: number
-  ticketPrice: number
+
+  @IsString()
+  location!: string
+
+  @IsNumber()
+  categoryFK!: number
+
+  @IsNumber()
+  @Min(0)
+  ticketPrice!: number
+
+  @IsOptional()
+  @IsBoolean()
+  open?: boolean
 }

@@ -1,7 +1,6 @@
-/**
- * DTO genérico para la creación de una categoría.
- * Se usa tanto para categorías de eventos como de servicios.
- */
+import { IsString } from 'class-validator'
+
 export class CreateCategoryDto {
-  name: string
+  @IsString()
+  name!: string
 }

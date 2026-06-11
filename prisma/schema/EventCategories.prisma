@@ -1,5 +1,0 @@
-model EventCategories {
-	id Int @id @default(autoincrement())
-	name String @unique
-	eventsRel Events[]
-}

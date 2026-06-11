@@ -1,11 +1,31 @@
-/**
- * DTO para la actualización parcial del perfil de usuario.
- * Campos opcionales porque PATCH solo modifica los valores enviados.
- */
+import { IsString, IsOptional, IsEmail } from 'class-validator'
+
 export class UpdateUserDto {
-  nombre?: string
+  @IsOptional()
+  @IsString()
+  user?: string
+
+  @IsOptional()
+  @IsString()
+  name?: string
+
+  @IsOptional()
+  @IsEmail()
   email?: string
-  avatarUrl?: string
-  telefono?: string
-  bio?: string
+
+  @IsOptional()
+  @IsString()
+  image?: string
+
+  @IsOptional()
+  @IsString()
+  dni?: string
+
+  @IsOptional()
+  @IsString()
+  cuit?: string
+
+  @IsOptional()
+  @IsString()
+  address?: string
 }

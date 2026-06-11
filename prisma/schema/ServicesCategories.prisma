@@ -1,5 +1,0 @@
-model ServiceCategories { 
-	id Int @id @default(autoincrement())
-	name String @unique
-	serviceRel Services[]
-}

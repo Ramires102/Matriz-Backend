@@ -1,7 +1,288 @@
 generator client {
-	provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+model Events {
+	id Int @id @default(autoincrement())
+	owner User @relation(fields: [userFK], references: [id])
+	userFK Int
+	name String
+	description String?
+	image String @default("https://undefined.com")
+	initDate DateTime @db.Timestamp
+	endingDate DateTime? @db.Timestamp
+	location String
+	open Boolean @default(false)
+	category EventCategories @relation(fields: [categoryFK], references: [id])
+	categoryFK Int
+	ticketPrice Int
+	rate Int @default(-1)
+	deletedAt DateTime? @db.Timestamp
+	createdAt DateTime @default(now()) @db.Timestamp(3)
+	updatedAt DateTime @updatedAt @db.Timestamp(3)
+	postsRel Posts[]
+	guestsRel Guests[]
+	eventsRatingRel EventRating[]
+	contractsRel Contrats[]
+	chatsRel Chats[]
+}
+model EventCategories {
+	id Int @id @default(autoincrement())
+	name String @unique
+	deletedAt DateTime? @db.Timestamp
+	createdAt DateTime @default(now()) @db.Timestamp(3)
+	updatedAt DateTime @updatedAt @db.Timestamp(3)
+	eventsRel Events[]
+}
+enum GuestsPayState {
+	NOT_REQUIRED
+	PENDING
+	APPROVED
+	PROCESSING
+	REJECTED
+}
+
+model Guests {
+	id Int @id @default(autoincrement())
+	event Events @relation(fields: [eventFK], references: [id])
+	eventFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	paymentState GuestsPayState
+	createdAt DateTime @default(now()) @db.Timestamp(3)
+
+	@@unique([eventFK, userFK])
+}
+model EventRating {
+	id Int @id @default(autoincrement())
+	rate Int
+	event Events @relation(fields: [eventFK], references: [id])
+	eventFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	createdAt DateTime @default(now()) @db.Timestamp(3)
+
+	@@unique([eventFK, userFK])
+}
+enum Role {
+	ADMIN
+	CONSUMER //usuario común, consumidor de servicios y eventos
+	ORGANIZATOR //organiza eventos, pero no ofrece servicios
+	OFFERER //ofrece servicios, puede organiza eventos (opcional)
+}
+
+model User {
+	id Int @id @default(autoincrement())
+	role Role @default(CONSUMER)
+	user String @unique
+	name String
+	password String
+	email String @unique
+	verified Boolean @default(false)
+	image String @default("https://undefined.com") //Acá hay que poener la URL a la imágen por default de Cloudinary (o sea, una cosa gris con un dibujito sensillo).
+	dni String? @unique
+	cuit String? @unique 
+	address String?
+	serviceFK Int?
+	taggedRel Tagged[]
+	serviceRel Services[]
+	serviceRatingRel ServiceRating[]
+	seensRel Seens[]
+	reactionsRel Reactions[]
+	postAnalyticsRel PostsAnalytics[]
+	postsRel Posts[]
+	messagesRel Messages[]
+	guestsRel Guests[]
+	eventsRel Events[]
+	enventsRatingRel EventRating[]
+	commentLikesRel CommentLikes[]
+	commentsRel Comment[]
+	chatMembersRel ChatMembers[]
+}enum PayType {
+	PER_HOUR
+	PER_SERVICE
+	PER_PERSON
+	PER_UNIT
+	COMPLETE
+}
+
+enum ResType {
+	HOME
+	NO_HOME
+	CLOUDE
+}
+
+model Services {
+	id Int @id @default(autoincrement())
+	provider User @relation(fields: [userFK], references: [id])
+	userFK Int
+	name String
+	description String
+	ubication String?
+	sourceUbication String?
+	category ServiceCategories @relation(fields: [categoryFK], references: [id])
+	categoryFK Int
+	coberRadius Int
+	basePrice Int
+	paymentType PayType
+	receptionType ResType
+	details Json? @db.JsonB
+	rating Int @default(0)
+	serviceRatingRel ServiceRating[]
+	contractsRel Contrats[]
+	avilabilityRel Avilability[]
+}model ServiceCategories { 
+	id Int @id @default(autoincrement())
+	name String @unique
+	serviceRel Services[]
+}enum ContratsPayState {
+	PENDING
+	APPROVED
+	PROCESSING
+	REJECTED
+}
+
+model Contrats {
+	id Int @id @default(autoincrement())
+	event Events @relation(fields: [eventFK], references: [id])
+	eventFK Int
+	service Services @relation(fields: [serviceFK], references: [id])
+	serviceFK Int
+	paymentState ContratsPayState
+}model ServiceRating {
+	id Int @id @default(autoincrement())
+	rate Int
+	service Services @relation(fields: [serviceFK], references: [id])
+	serviceFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+
+	@@unique([serviceFK, userFK])
+}model Comment {
+	id Int @id @default(autoincrement())
+	post Posts @relation(fields: [postFK], references: [id])
+	postFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	text String?
+	image String?
+	likesCount Int @default(0)
+	createdAt DateTime @db.Timestamp(3)
+	commentLikesRel CommentLikes[]
+}model CommentLikes {
+	id Int @id @default(autoincrement())
+	comment Comment @relation(fields: [commentFK], references: [id])
+	commentFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+}model Posts {
+	id Int @id @default(autoincrement())
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	text String?
+	media Json? @db.JsonB
+	ubication String?
+	isAdd Boolean @default(false)
+	likesCount Int @default(0)
+	sharesCount Int @default(0)
+	favouritesCount Int @default(0)
+	commentsCount Int @default(0)
+	restrictedComments Boolean @default(false)
+	sourceIp String
+	event Events @relation(fields: [eventFK], references: [id])
+	eventFK Int
+	rate Int
+	interactions Int
+	taggedRel Tagged[]
+	postsAnalyticsRel PostsAnalytics[]
+	commentsRel Comment[]
+}model PostsAnalytics {
+	id Int @id @default(autoincrement())
+	post Posts @relation(fields: [postFK], references: [id])
+	postFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	liked Boolean @default(false)
+	commented Boolean @default(false)
+	shared Boolean @default(false)
+	favourite Boolean @default(false)
+	dwellTime Int
+	completionRate Int
+	notInterested Boolean @default(false)
+	finalRate Int
+}model Reactions {
+	id Int @id @default(autoincrement())
+	messages Messages @relation(fields: [messagesFK], references: [id])
+	messagesFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	emoji String @db.Char(1)
+}model Tagged {
+	id Int @id @default(autoincrement())
+	post Posts @relation(fields: [postFK], references: [id])
+	postFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+}enum Type {
+	GROUP
+	CHAT
+}
+
+model Chats {
+	id Int @id @default(autoincrement())
+	name String
+	image String @default("https://undefined.com") //Acá hay que poener la URL a la imágen por default de Cloudinary (o sea, una cosa gris con un dibujito sensillo).
+	type Type @default(CHAT)
+	addMembers Boolean @default(true)
+	sendMessages Boolean @default(true)
+	approveNewMembers Boolean @default(false)
+	event Events @relation(fields: [eventId], references: [id])
+	eventId Int
+	destroyAfterEvent Boolean @default(true)
+	membersAmount Int @default(2)
+	messages Messages[]
+	chatMembersRel ChatMembers[]
+}model ChatMembers {
+	id Int @id @default(autoincrement())
+	chat Chats @relation(fields: [chatFK], references: [id])
+	chatFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	isAdmin Boolean?
+
+	@@unique([chatFK, userFK])
+}model Messages {
+	id Int @id @default(autoincrement())
+	chat Chats @relation(fields: [chatFK], references: [id])
+	chatFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	text String?
+	image String?
+	reactions Json @db.JsonB
+	seen Boolean @default(false)
+	createdAt DateTime @db.Timestamp(0)
+	updatedAt DateTime @db.Timestamp(0)
+	seens Seens[]
+	reactionsRel Reactions[]
+}model Seens {
+	id Int @id @default(autoincrement())
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	message Messages @relation(fields: [messageFK], references: [id])
+	messageFK Int
+
+	@@unique([userFK, messageFK])
+}model Avilability {
+	id Int @id @default(autoincrement())
+	service Services @relation(fields: [serviceFK], references: [id])
+	serviceFK Int
+	initDate DateTime @db.Timestamp(0)
+	endDate DateTime @db.Timestamp(0)
+
+	@@unique([serviceFK, initDate])
+	@@unique([serviceFK, endDate])
 }
