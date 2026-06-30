@@ -4,7 +4,10 @@ import { ConfigModule } from '@nestjs/config'
 import { MulterModule } from '@nestjs/platform-express'
 import { memoryStorage } from 'multer'
 import { UserController } from './Rutas/user.controller'
+import { AuthController } from './Rutas/auth.controller'
 import { UserService } from './Services/user.service'
+import { AuthService } from './Services/auth.service'
+import { JwtService } from './Services/jwt.service'
 import { EventController } from './Rutas/event.controller'
 import { EventService } from './Services/event.service'
 import { EventCategoriesController } from './Rutas/event-categories.controller'
@@ -26,12 +29,15 @@ import { RolesGuard } from './auth/guards/roles.guard'
     }),
   ],
   controllers: [
+    AuthController,
     UserController,
     EventController,
     EventCategoriesController,
     ServiceCategoriesController,
   ],
   providers: [
+    AuthService,
+    JwtService,
     UserService,
     EventService,
     EventCategoriesService,

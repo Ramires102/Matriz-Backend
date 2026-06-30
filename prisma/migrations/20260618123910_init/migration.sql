@@ -53,6 +53,15 @@ CREATE TABLE "Chats" (
 );
 
 -- CreateTable
+CREATE TABLE "CommentLikes" (
+    "id" SERIAL NOT NULL,
+    "commentFK" INTEGER NOT NULL,
+    "userFK" INTEGER NOT NULL,
+
+    CONSTRAINT "CommentLikes_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Comment" (
     "id" SERIAL NOT NULL,
     "postFK" INTEGER NOT NULL,
@@ -63,15 +72,6 @@ CREATE TABLE "Comment" (
     "createdAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Comment_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "CommentLikes" (
-    "id" SERIAL NOT NULL,
-    "commentFK" INTEGER NOT NULL,
-    "userFK" INTEGER NOT NULL,
-
-    CONSTRAINT "CommentLikes_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -88,6 +88,9 @@ CREATE TABLE "Contrats" (
 CREATE TABLE "EventCategories" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "deletedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "EventCategories_pkey" PRIMARY KEY ("id")
 );
@@ -116,6 +119,9 @@ CREATE TABLE "Events" (
     "categoryFK" INTEGER NOT NULL,
     "ticketPrice" INTEGER NOT NULL,
     "rate" INTEGER NOT NULL DEFAULT -1,
+    "deletedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Events_pkey" PRIMARY KEY ("id")
 );
@@ -125,7 +131,7 @@ CREATE TABLE "Guests" (
     "id" SERIAL NOT NULL,
     "eventFK" INTEGER NOT NULL,
     "userFK" INTEGER NOT NULL,
-    "paymentState" "GuestsPayState" NOT NULL,
+    "paymentState" "GuestsPayState" NOT NULL DEFAULT 'NOT_REQUIRED',
 
     CONSTRAINT "Guests_pkey" PRIMARY KEY ("id")
 );
@@ -143,6 +149,23 @@ CREATE TABLE "Messages" (
     "updatedAt" TIMESTAMP(0) NOT NULL,
 
     CONSTRAINT "Messages_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "PostsAnalytics" (
+    "id" SERIAL NOT NULL,
+    "postFK" INTEGER NOT NULL,
+    "userFK" INTEGER NOT NULL,
+    "liked" BOOLEAN NOT NULL DEFAULT false,
+    "commented" BOOLEAN NOT NULL DEFAULT false,
+    "shared" BOOLEAN NOT NULL DEFAULT false,
+    "favourite" BOOLEAN NOT NULL DEFAULT false,
+    "dwellTime" INTEGER NOT NULL,
+    "completionRate" INTEGER NOT NULL,
+    "notInterested" BOOLEAN NOT NULL DEFAULT false,
+    "finalRate" INTEGER NOT NULL,
+
+    CONSTRAINT "PostsAnalytics_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -164,23 +187,6 @@ CREATE TABLE "Posts" (
     "interactions" INTEGER NOT NULL,
 
     CONSTRAINT "Posts_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "PostsAnalytics" (
-    "id" SERIAL NOT NULL,
-    "postFK" INTEGER NOT NULL,
-    "userFK" INTEGER NOT NULL,
-    "liked" BOOLEAN NOT NULL DEFAULT false,
-    "commented" BOOLEAN NOT NULL DEFAULT false,
-    "shared" BOOLEAN NOT NULL DEFAULT false,
-    "favourite" BOOLEAN NOT NULL DEFAULT false,
-    "dwellTime" INTEGER NOT NULL,
-    "completionRate" INTEGER NOT NULL,
-    "notInterested" BOOLEAN NOT NULL DEFAULT false,
-    "finalRate" INTEGER NOT NULL,
-
-    CONSTRAINT "PostsAnalytics_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -213,6 +219,14 @@ CREATE TABLE "ServiceRating" (
 );
 
 -- CreateTable
+CREATE TABLE "ServiceCategories" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+
+    CONSTRAINT "ServiceCategories_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Services" (
     "id" SERIAL NOT NULL,
     "userFK" INTEGER NOT NULL,
@@ -229,14 +243,6 @@ CREATE TABLE "Services" (
     "rating" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "Services_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "ServiceCategories" (
-    "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-
-    CONSTRAINT "ServiceCategories_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -282,6 +288,9 @@ CREATE UNIQUE INDEX "EventCategories_name_key" ON "EventCategories"("name");
 CREATE UNIQUE INDEX "EventRating_eventFK_userFK_key" ON "EventRating"("eventFK", "userFK");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Guests_eventFK_userFK_key" ON "Guests"("eventFK", "userFK");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Seens_userFK_messageFK_key" ON "Seens"("userFK", "messageFK");
 
 -- CreateIndex
@@ -315,16 +324,16 @@ ALTER TABLE "ChatMembers" ADD CONSTRAINT "ChatMembers_userFK_fkey" FOREIGN KEY (
 ALTER TABLE "Chats" ADD CONSTRAINT "Chats_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Events"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Comment" ADD CONSTRAINT "Comment_postFK_fkey" FOREIGN KEY ("postFK") REFERENCES "Posts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Comment" ADD CONSTRAINT "Comment_userFK_fkey" FOREIGN KEY ("userFK") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "CommentLikes" ADD CONSTRAINT "CommentLikes_commentFK_fkey" FOREIGN KEY ("commentFK") REFERENCES "Comment"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "CommentLikes" ADD CONSTRAINT "CommentLikes_userFK_fkey" FOREIGN KEY ("userFK") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Comment" ADD CONSTRAINT "Comment_postFK_fkey" FOREIGN KEY ("postFK") REFERENCES "Posts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Comment" ADD CONSTRAINT "Comment_userFK_fkey" FOREIGN KEY ("userFK") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Contrats" ADD CONSTRAINT "Contrats_eventFK_fkey" FOREIGN KEY ("eventFK") REFERENCES "Events"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -357,16 +366,16 @@ ALTER TABLE "Messages" ADD CONSTRAINT "Messages_chatFK_fkey" FOREIGN KEY ("chatF
 ALTER TABLE "Messages" ADD CONSTRAINT "Messages_userFK_fkey" FOREIGN KEY ("userFK") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Posts" ADD CONSTRAINT "Posts_userFK_fkey" FOREIGN KEY ("userFK") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Posts" ADD CONSTRAINT "Posts_eventFK_fkey" FOREIGN KEY ("eventFK") REFERENCES "Events"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "PostsAnalytics" ADD CONSTRAINT "PostsAnalytics_postFK_fkey" FOREIGN KEY ("postFK") REFERENCES "Posts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PostsAnalytics" ADD CONSTRAINT "PostsAnalytics_userFK_fkey" FOREIGN KEY ("userFK") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Posts" ADD CONSTRAINT "Posts_userFK_fkey" FOREIGN KEY ("userFK") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Posts" ADD CONSTRAINT "Posts_eventFK_fkey" FOREIGN KEY ("eventFK") REFERENCES "Events"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Reactions" ADD CONSTRAINT "Reactions_messagesFK_fkey" FOREIGN KEY ("messagesFK") REFERENCES "Messages"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
