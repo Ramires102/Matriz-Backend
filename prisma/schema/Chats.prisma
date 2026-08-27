@@ -11,8 +11,8 @@ model Chats {
 	addMembers Boolean @default(true)
 	sendMessages Boolean @default(true)
 	approveNewMembers Boolean @default(false)
-	event Events @relation(fields: [eventId], references: [id])
-	eventId Int
+	event Events? @relation(fields: [eventId], references: [id])
+	eventId Int?
 	destroyAfterEvent Boolean @default(true)
 	membersAmount Int @default(2)
 	messages Messages[]
