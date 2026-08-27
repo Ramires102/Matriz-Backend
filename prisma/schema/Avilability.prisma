@@ -1,0 +1,10 @@
+model Avilability {
+	id Int @id @default(autoincrement())
+	service Services @relation(fields: [serviceFK], references: [id])
+	serviceFK Int
+	initDate DateTime @db.Timestamp(0)
+	endDate DateTime @db.Timestamp(0)
+
+	@@unique([serviceFK, initDate])
+	@@unique([serviceFK, endDate])
+}

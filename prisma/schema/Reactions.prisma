@@ -1,0 +1,8 @@
+model Reactions {
+	id Int @id @default(autoincrement())
+	messages Messages @relation(fields: [messagesFK], references: [id])
+	messagesFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	emoji String @db.Char(1)
+}

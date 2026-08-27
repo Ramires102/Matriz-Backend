@@ -1,0 +1,12 @@
+model Comment {
+	id Int @id @default(autoincrement())
+	post Posts @relation(fields: [postFK], references: [id])
+	postFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	text String?
+	image String?
+	likesCount Int @default(0)
+	createdAt DateTime @db.Timestamp(3)
+	commentLikesRel CommentLikes[]
+}

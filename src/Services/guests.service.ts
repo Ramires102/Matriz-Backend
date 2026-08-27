@@ -20,8 +20,8 @@ export class GuestsService {
       throw new BadRequestException('El evento no acepta invitados')
     }
 
-    const existing = await this.prisma.guests.findUnique({
-      where: { eventFK_userFK: { eventFK: eventId, userFK: userId } },
+    const existing = await this.prisma.guests.findFirst({
+      where: { eventFK: eventId, userFK: userId },
     })
     if (existing) {
       throw new ConflictException('El usuario ya es invitado de este evento')
@@ -37,8 +37,8 @@ export class GuestsService {
   }
 
   async removeGuest(eventId: number, userId: number) {
-    const guest = await this.prisma.guests.findUnique({
-      where: { eventFK_userFK: { eventFK: eventId, userFK: userId } },
+    const guest = await this.prisma.guests.findFirst({
+      where: { eventFK: eventId, userFK: userId },
     })
     if (!guest) {
       throw new NotFoundException('El usuario no es invitado de este evento')

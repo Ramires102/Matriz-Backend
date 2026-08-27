@@ -8,7 +8,7 @@ export class EventCategoriesService {
 
   async create(dto: CreateCategoryDto) {
     const existing = await this.prisma.eventCategories.findFirst({
-      where: { name: dto.name, deletedAt: null },
+      where: { name: dto.name },
     })
     if (existing) {
       throw new ConflictException('La categoría de evento ya existe')
@@ -19,12 +19,7 @@ export class EventCategoriesService {
   }
 
   async findAll(sinceTimestamp?: string) {
-    const where: any = { deletedAt: null }
-
-    if (sinceTimestamp) {
-      const since = new Date(sinceTimestamp)
-      where.createdAt = { gt: since }
-    }
+    const where: any = {}
 
     return this.prisma.eventCategories.findMany({
       where,
@@ -34,22 +29,21 @@ export class EventCategoriesService {
 
   async softDelete(id: number) {
     const category = await this.prisma.eventCategories.findFirst({
-      where: { id, deletedAt: null },
+      where: { id },
     })
     if (!category) {
       throw new NotFoundException('Categoría no encontrada')
     }
 
     const eventsCount = await this.prisma.events.count({
-      where: { categoryFK: id, deletedAt: null },
+      where: { categoryFK: id },
     })
     if (eventsCount > 0) {
       throw new ConflictException('No se puede eliminar una categoría con eventos asociados')
     }
 
-    return this.prisma.eventCategories.update({
+    return this.prisma.eventCategories.delete({
       where: { id },
-      data: { deletedAt: new Date() },
     })
   }
 }

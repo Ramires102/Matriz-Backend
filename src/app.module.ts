@@ -18,6 +18,8 @@ import { PrismaService } from './Services/prisma.service'
 import { GuestsService } from './Services/guests.service'
 import { EventRatingService } from './Services/event-rating.service'
 import { EmailService } from './Services/email.service'
+import { ChatController } from './Rutas/chat.controller'
+import { ChatService } from './Services/chat.service'
 import { PrismaClientExceptionFilter } from './common/filters/prisma-exception.filter'
 import { RolesGuard } from './auth/guards/roles.guard'
 
@@ -34,6 +36,7 @@ import { RolesGuard } from './auth/guards/roles.guard'
     EventController,
     EventCategoriesController,
     ServiceCategoriesController,
+    ChatController,
   ],
   providers: [
     AuthService,
@@ -46,6 +49,7 @@ import { RolesGuard } from './auth/guards/roles.guard'
     GuestsService,
     EventRatingService,
     EmailService,
+    ChatService,
     RolesGuard,
     {
       provide: APP_FILTER,

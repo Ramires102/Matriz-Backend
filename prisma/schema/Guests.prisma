@@ -1,0 +1,16 @@
+enum GuestsPayState {
+	NOT_REQUIRED
+	PENDING
+	APPROVED
+	PROCESSING
+	REJECTED
+}
+
+model Guests {
+	id Int @id @default(autoincrement())
+	event Events @relation(fields: [eventFK], references: [id]) 
+	eventFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	paymentState GuestsPayState
+}

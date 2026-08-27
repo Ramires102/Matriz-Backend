@@ -1,0 +1,34 @@
+enum PayType {
+	PER_HOUR
+	PER_SERVICE
+	PER_PERSON
+	PER_UNIT
+	COMPLETE
+}
+
+enum ResType {
+	HOME
+	NO_HOME
+	CLOUDE
+}
+
+model Services {
+	id Int @id @default(autoincrement())
+	provider User @relation(fields: [userFK], references: [id])
+	userFK Int
+	name String
+	description String
+	ubication String?
+	sourceUbication String?
+	category ServiceCategories @relation(fields: [categoryFK], references: [id])
+	categoryFK Int
+	coberRadius Int
+	basePrice Int
+	paymentType PayType
+	receptionType ResType
+	details Json? @db.JsonB
+	rating Int @default(0)
+	serviceRatingRel ServiceRating[]
+	contractsRel Contrats[]
+	avilabilityRel Avilability[]
+}

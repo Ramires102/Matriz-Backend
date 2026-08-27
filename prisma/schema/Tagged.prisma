@@ -1,0 +1,7 @@
+model Tagged {
+	id Int @id @default(autoincrement())
+	post Posts @relation(fields: [postFK], references: [id])
+	postFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+}

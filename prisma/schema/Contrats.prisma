@@ -1,0 +1,15 @@
+enum ContratsPayState {
+	PENDING
+	APPROVED
+	PROCESSING
+	REJECTED
+}
+
+model Contrats {
+	id Int @id @default(autoincrement())
+	event Events @relation(fields: [eventFK], references: [id])
+	eventFK Int
+	service Services @relation(fields: [serviceFK], references: [id])
+	serviceFK Int
+	paymentState ContratsPayState
+}

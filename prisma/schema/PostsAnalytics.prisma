@@ -1,0 +1,15 @@
+model PostsAnalytics {
+	id Int @id @default(autoincrement())
+	post Posts @relation(fields: [postFK], references: [id])
+	postFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	liked Boolean @default(false)
+	commented Boolean @default(false)
+	shared Boolean @default(false)
+	favourite Boolean @default(false)
+	dwellTime Int
+	completionRate Int
+	notInterested Boolean @default(false)
+	finalRate Int
+}

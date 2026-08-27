@@ -1,0 +1,10 @@
+model ServiceRating {
+	id Int @id @default(autoincrement())
+	rate Int
+	service Services @relation(fields: [serviceFK], references: [id])
+	serviceFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+
+	@@unique([serviceFK, userFK])
+}

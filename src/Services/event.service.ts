@@ -13,7 +13,7 @@ export class EventService {
 
   private async ensureEventCategoryExists(categoryFK: number) {
     const category = await this.prisma.eventCategories.findFirst({
-      where: { id: categoryFK, deletedAt: null },
+      where: { id: categoryFK },
     })
     if (!category) {
       throw new BadRequestException('La categoría de evento especificada no existe')
@@ -72,9 +72,7 @@ export class EventService {
   }
 
   async findAll(query: Record<string, any>) {
-    const where: any = {
-      deletedAt: null,
-    }
+    const where: any = {} as any
 
     if (query.search) {
       where.OR = [
@@ -95,8 +93,6 @@ export class EventService {
       where.open = true
     } else if (query.open === 'false') {
       where.open = false
-    } else {
-      where.open = true
     }
 
     const initDateFilter: any = {}
@@ -113,7 +109,7 @@ export class EventService {
     const limit = Math.min(Number(query.limit) || 20, 100)
     const cursorId = query.cursor ? Number(query.cursor) : undefined
     const orderDirection = query.order === 'desc' ? 'desc' : 'asc'
-    const orderField = query.orderBy === 'name' ? 'name' : 'id'
+    const orderField = query.orderBy ?? 'initDate'
 
     const findArgs: any = {
       where,
@@ -143,7 +139,7 @@ export class EventService {
 
   async findOne(id: string, userId?: string) {
     const event = await this.prisma.events.findFirst({
-      where: { id: Number(id), deletedAt: null },
+      where: { id: Number(id) },
       include: {
         ...this.eventPublicInclude,
         guestsRel: { select: { userFK: true } },
@@ -171,7 +167,7 @@ export class EventService {
 
   async update(id: string, dto: UpdateEventDto, userId: string, imageUrl?: string) {
     const event = await this.prisma.events.findFirst({
-      where: { id: Number(id), deletedAt: null },
+      where: { id: Number(id) },
     })
     if (!event) {
       throw new NotFoundException('Evento no encontrado')
@@ -200,7 +196,7 @@ export class EventService {
 
   async remove(id: string, userId: string) {
     const event = await this.prisma.events.findFirst({
-      where: { id: Number(id), deletedAt: null },
+      where: { id: Number(id) },
     })
     if (!event) {
       throw new NotFoundException('Evento no encontrado')
@@ -228,9 +224,8 @@ export class EventService {
     await this.prisma.eventRating.deleteMany({ where: { eventFK: Number(id) } })
     await this.prisma.chats.deleteMany({ where: { eventId: Number(id) } })
 
-    await this.prisma.events.update({
+    await this.prisma.events.delete({
       where: { id: Number(id) },
-      data: { deletedAt: new Date() },
     })
 
     return { success: true }

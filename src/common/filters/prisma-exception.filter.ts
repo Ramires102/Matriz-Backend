@@ -42,7 +42,7 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
         break
       default:
         status = HttpStatus.INTERNAL_SERVER_ERROR
-        message = `Error de base de datos: ${exception.message}`
+        message = `Error de base de datos [${exception.code}]: ${exception.message}`
         break
     }
 

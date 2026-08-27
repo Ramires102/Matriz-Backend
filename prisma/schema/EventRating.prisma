@@ -1,0 +1,10 @@
+model EventRating {
+	id Int @id @default(autoincrement())
+	rate Int
+	event Events @relation(fields: [eventFK], references: [id])
+	eventFK Int
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+
+	@@unique([eventFK, userFK])
+}

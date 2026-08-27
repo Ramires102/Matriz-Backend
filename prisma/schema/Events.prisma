@@ -1,0 +1,21 @@
+model Events {
+	id Int @id @default(autoincrement())
+	owner User @relation(fields: [userFK], references: [id])
+	userFK Int
+	name String
+	description String?
+	image String @default("https://undefined.com") //Acá hay que poener la URL a la imágen por default de Cloudinary (o sea, una cosa gris con un dibujito sensillo).
+	initDate DateTime @db.Timestamp
+	endingDate DateTime? @db.Timestamp
+	location String
+	open Boolean @default(false)
+	category EventCategories @relation(fields: [categoryFK], references: [id])
+	categoryFK Int
+	ticketPrice Int
+	rate Int @default(-1)
+	postsRel Posts[]
+	guestsRel Guests[]
+	eventsRatingRel EventRating[]
+	contractsRel Contrats[]
+	chatsRel Chats[]
+}

@@ -1,0 +1,9 @@
+model Seens {
+	id Int @id @default(autoincrement())
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	message Messages @relation(fields: [messageFK], references: [id])
+	messageFK Int
+
+	@@unique([userFK, messageFK])
+}

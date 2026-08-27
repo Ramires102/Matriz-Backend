@@ -1,0 +1,22 @@
+model Posts {
+	id Int @id @default(autoincrement())
+	user User @relation(fields: [userFK], references: [id])
+	userFK Int
+	text String?
+	media Json? @db.JsonB
+	ubication String?
+	isAdd Boolean @default(false)
+	likesCount Int @default(0)
+	sharesCount Int @default(0)
+	favouritesCount Int @default(0)
+	commentsCount Int @default(0)
+	restrictedComments Boolean @default(false)
+	sourceIp String
+	event Events @relation(fields: [eventFK], references: [id])
+	eventFK Int
+	rate Int
+	interactions Int
+	taggedRel Tagged[]
+	postsAnalyticsRel PostsAnalytics[]
+	commentsRel Comment[]
+}

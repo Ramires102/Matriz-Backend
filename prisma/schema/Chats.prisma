@@ -1,0 +1,20 @@
+enum Type {
+	GROUP
+	CHAT
+}
+
+model Chats {
+	id Int @id @default(autoincrement())
+	name String
+	image String @default("https://undefined.com") //Acá hay que poener la URL a la imágen por default de Cloudinary (o sea, una cosa gris con un dibujito sensillo).
+	type Type @default(CHAT)
+	addMembers Boolean @default(true)
+	sendMessages Boolean @default(true)
+	approveNewMembers Boolean @default(false)
+	event Events? @relation(fields: [eventId], references: [id])
+	eventId Int?
+	destroyAfterEvent Boolean @default(true)
+	membersAmount Int @default(2)
+	messages Messages[]
+	chatMembersRel ChatMembers[]
+}
