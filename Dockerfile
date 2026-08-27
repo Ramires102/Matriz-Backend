@@ -42,5 +42,5 @@ EXPOSE 3000
 # Entorno de producción
 ENV NODE_ENV=production
 
-# Comando: Primero corre las migraciones de Postgres y luego inicia la App
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:prod"]
+# Comando: Genera cliente de Prisma y luego inicia la App
+CMD ["sh", "-c", "npx prisma generate && npm run start:prod"]
