@@ -25,8 +25,8 @@ RUN npm run build
 # --- ETAPA 2: Producción (Runtime) ---
 FROM node:20-alpine
 
-# libvips es necesaria para el procesamiento de imágenes con Sharp en producción
-RUN apk add --no-cache libvips-dev
+# Dependencias de sistema necesarias para Sharp y runtime en Alpine
+RUN apk add --no-cache vips-dev libc6-compat
 
 WORKDIR /app
 
@@ -42,5 +42,5 @@ EXPOSE 3000
 # Entorno de producción
 ENV NODE_ENV=production
 
-# Comando: Primero corre las migraciones de Postgres y luego inicia la App
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:prod"]
+# Comando: Genera cliente de Prisma y luego inicia la App
+CMD ["sh", "-c", "npx prisma generate && npm run start:prod"]
